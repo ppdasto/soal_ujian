@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ujian Online Pro V5</title>
+    <style>
+        /* =========================================
+           SETTING GLOBAL & WARNA
+           ========================================= */
+        :root {
+            --col-teal: #00878F;
+            --col-teal-light: #62AEB2;
+            --col-teal-faint: #E0F7FA;
+            --col-bg: #DAE1E7;
+            --col-danger: #E74C3C;
+            --col-success: #2ECC71;
+            --sidebar-w: 320px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--col-bg);
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* MODAL POP-UP */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        #modal-box {
+            background: white;
+            width: 90%;
+            max-width: 420px;
+            padding: 35px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        #modal-overlay.show #modal-box {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .btn-modal {
+            padding: 12px 35px;
+            border-radius: 50px;
+            border: none;
+            font-weight: bold;
+            font-size: 1rem;
+            margin: 10px 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-modal:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-teal {
+            background: var(--col-teal);
+            color: white;
+        }
+
+        .btn-red {
+            background: var(--col-danger);
+            color: white;
+        }
+
+        .btn-grey {
+            background: #f0f2f5;
+            color: #555;
+        }
+
+        /* LOGIN LAYER */
+        #login-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--col-teal);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: white;
+            padding: 45px 35px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .inp-login {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #eef2f7;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+            background: #f8fafc;
+        }
+
+        .inp-login:focus {
+            border-color: var(--col-teal);
+            background: white;
+        }
+
+        /* APP LAYOUT */
+        #app-layer {
+            display: none;
+            height: 100%;
+            width: 100%;
+            flex-direction: row;
+        }
+
+        #sidebar {
+            width: var(--sidebar-w);
+            background: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 2;
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-header-teal {
+            background: var(--col-teal);
+            color: white;
+            padding: 35px 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .custom-logo-header {
+            max-width: 180px;
+            max-height: 60px;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .header-divider {
+            width: 80%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 25px 0;
+        }
+
+        .timer-val {
+            font-family: 'Courier New', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .sidebar-nav-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 25px;
+        }
+
+        .nav-buttons-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .nav-dot {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: #F0F4F8;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .nav-dot:hover {
+            transform: scale(1.15);
+            background: #e2e8f0;
+        }
+
+        .nav-dot.active {
+            background: var(--col-teal) !important;
+            color: white !important;
+            box-shadow: 0 0 0 5px #B2EBF2;
+            transform: scale(1.1);
+        }
+
+        .nav-dot.answered {
+            background: white;
+            color: var(--col-teal);
+            box-shadow: 0 0 0 5px #B2EBF2;
+        }
+
+        #main-area {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 100px;
+            overflow-y: auto;
+        }
+
+        .q-card {
+            background: white;
+            padding: 60px;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 950px;
+            margin: auto 0;
+        }
+
+        .q-text {
+            font-size: 1.6rem;
+            line-height: 1.5;
+            margin-bottom: 40px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        #q-img-wrap {
+            text-align: center;
+            margin-bottom: 40px;
+            display: none;
+        }
+
+        #q-img-wrap img {
+            max-width: 100%;
+            max-height: 450px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .opt-box {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            border: 2px solid #f0f4f8;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.15rem;
+            background: #fff;
+        }
+
+        .opt-box:hover {
+            background: var(--col-teal-faint);
+            border-color: var(--col-teal-light);
+            transform: translateX(5px);
+        }
+
+        .opt-box.selected {
+            background: var(--col-teal);
+            border-color: var(--col-teal);
+            color: white;
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(0, 135, 143, 0.25);
+        }
+
+        .cert-text-box {
+            background: white;
+            color: var(--col-teal-dark);
+            font-weight: 900;
+            font-size: 0.9rem;
+            letter-spacing: 1.5px;
+            padding: 6px 12px;
+            border-radius: 2px;
+        }
+
+        .opt-radio {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #cbd5e0;
+            border-radius: 50%;
+            margin-right: 20px;
+            flex-shrink: 0;
+            position: relative;
+            transition: 0.2s;
+        }
+
+        .selected .opt-radio {
+            border-color: white;
+        }
+
+        .selected .opt-radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            background: white;
+            color: var(--col-teal);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .nav-arrow svg {
+            width: 32px;
+            height: 32px;
+            fill: currentColor;
+        }
+
+        .nav-arrow:hover:not(:disabled) {
+            background: var(--col-teal);
+            color: white;
+            transform: translateY(-50%) scale(1.15);
+        }
+
+        .nav-arrow:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #btn-prev {
+            left: 340px;
+        }
+
+        #btn-next {
+            right: 40px;
+        }
+
+        #btn-finish {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 101;
+            padding: 18px 50px;
+            background: var(--col-danger);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            box-shadow: 0 15px 35px rgba(231, 76, 60, 0.4);
+            cursor: pointer;
+            display: none;
+            transition: all 0.3s;
+        }
+
+        #btn-finish:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+
+        @media (max-width: 1024px) {
+            #btn-prev {
+                left: 30px;
+            }
+
+            #btn-next {
+                right: 30px;
+            }
+
+            #main-area {
+                padding: 40px 80px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #app-layer {
+                flex-direction: column;
+            }
+
+            #sidebar {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .sidebar-header-teal {
+                flex-direction: row;
+                width: 100%;
+                padding: 12px 20px;
+                justify-content: space-between;
+                background: white;
+                border-bottom: 2px solid var(--col-teal);
+            }
+
+            .header-logo-row {
+                margin: 0;
+                width: auto;
+            }
+
+            .custom-logo-header {
+                max-height: 40px;
+                filter: none;
+            }
+
+            .header-divider,
+            .sidebar-nav-content {
+                display: none;
+            }
+
+            .timer-wrapper {
+                align-items: flex-end;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .timer-val {
+                font-size: 1.8rem;
+                color: var(--col-teal);
+            }
+
+            #main-area {
+                padding: 25px 20px 120px 20px;
+                display: block;
+            }
+
+            .q-card {
+                padding: 30px;
+                margin-top: 10px;
+                border-radius: 15px;
+            }
+
+            .q-text {
+                font-size: 1.3rem;
+            }
+
+            .opt-box {
+                padding: 15px 20px;
+                font-size: 1rem;
+            }
+
+            .nav-arrow {
+                position: fixed;
+                top: auto;
+                bottom: 25px;
+                transform: none !important;
+                width: 55px;
+                height: 55px;
+            }
+
+            .nav-arrow svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            #btn-prev {
+                left: 25px;
+            }
+
+            #btn-next {
+                right: 25px;
+            }
+
+            #btn-finish {
+                bottom: 25px;
+                right: 25px;
+                padding: 15px 35px;
+                font-size: 1rem;
+            }
+        }
+
+        /* =========================================
+   LOADING SPINNER STYLE BARU
+   ========================================= */
+        #loading-verify {
+            display: none;
+            /* Awalnya disembunyikan */
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0 0 0;
+            color: var(--col-teal);
+            font-weight: 600;
+        }
+
+        .dot-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 20px;
+            margin-bottom: 15px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            margin: 0 5px;
+            background-color: var(--col-teal);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1.0);
+            }
+        }
+
+        /* ... di dalam blok <style> ... */
+
+        /* Variabel Warna Dark Mode */
+        :root {
+            /* ... variabel yang sudah ada ... */
+            --col-bg-dark: #121212;
+            --col-card-dark: #1e1e1e;
+            --col-text-dark: #e0e0e0;
+            --col-text-secondary-dark: #b0b0b0;
+            --col-border-dark: #333333;
+        }
+
+        /* --------------------------------- */
+        /* DARK MODE STYLES */
+        /* --------------------------------- */
+        body.dark-mode {
+            background: var(--col-bg-dark);
+        }
+
+        body.dark-mode #sidebar {
+            background: var(--col-card-dark);
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark-mode .sidebar-header-teal {
+            background: var(--col-card-dark);
+            /* Ubah agar tidak terlalu terang */
+        }
+
+        body.dark-mode .timer-val {
+            color: var(--col-text-dark);
+        }
+
+        body.dark-mode .q-card {
+            background: var(--col-card-dark);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark-mode .q-text {
+            color: var(--col-text-dark);
+        }
+
+        body.dark-mode .opt-box {
+            background: var(--col-card-dark);
+            border: 2px solid var(--col-border-dark);
+            color: var(--col-text-secondary-dark);
+        }
+
+        body.dark-mode .opt-box:hover {
+            background: var(--col-border-dark);
+        }
+
+        /* Penyesuaian Nav Dot untuk Dark Mode */
+        body.dark-mode .nav-dot {
+            background: #333;
+            color: #888;
+        }
+
+        body.dark-mode .nav-dot.answered {
+            background: var(--col-card-dark);
+            color: var(--col-teal-light);
+            box-shadow: 0 0 0 5px #004d40;
+            /* Teal gelap */
+        }
+
+        body.dark-mode .nav-dot.active {
+            background: var(--col-teal) !important;
+            color: white !important;
+            box-shadow: 0 0 0 5px #004d40;
+        }
+
+        /* Penyesuaian Header Mobile pada Dark Mode */
+        @media (max-width: 768px) {
+            body.dark-mode .sidebar-header-teal {
+                background: var(--col-card-dark);
+                border-bottom: 2px solid var(--col-teal);
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            }
+
+            body.dark-mode .timer-val {
+                color: var(--col-teal);
+                /* Pertahankan warna teal di mobile */
+            }
+        }
+
+        /* --------------------------------- */
+        /* FONT SIZE STYLES */
+        /* --------------------------------- */
+        .q-card.font-small .q-text {
+            font-size: 1.0rem;
+            /* Contoh ukuran kecil */
+        }
+
+        .q-card.font-medium .q-text {
+            font-size: 1.2rem;
+            /* Ukuran default */
+        }
+
+        .q-card.font-large .q-text {
+            font-size: 1.4rem;
+            /* Contoh ukuran besar */
+        }
+
+        /* Penyesuaian ukuran teks opsi */
+        .q-card.font-small .opt-box {
+            font-size: 1.0rem;
+        }
+
+        .q-card.font-large .opt-box {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="modal-overlay">
+        <div id="modal-box">
+            <div id="modal-ico"></div>
+            <h3 id="modal-ti" style="margin-bottom:15px;color:#333;font-weight:800;"></h3>
+            <p id="modal-msg" style="font-size:1.1rem;color:#555;margin-bottom:30px;line-height:1.6;"></p>
+            <div id="modal-btns" style="display:flex;justify-content:center;flex-wrap:wrap;"></div>
+        </div>
+    </div>
+
+    <div id="login-layer">
+        <div class="login-box">
+            <div class="header-logo-row">
+                <img src="https://github.com/jokosaptono17/PLANTASTO/blob/main/LOGO%20PPD%202021.png?raw=true"
+                    alt="Logo" class="custom-logo-header" onerror="this.style.display='none'">
+            </div>
+            <h2 style="color:var(--col-teal); margin-bottom:30px; font-weight:800; font-size:2rem;">PLANT ASTO EXAM</h2>
+
+            <input type="text" id="inp-name" class="inp-login" placeholder="Nama Lengkap" autocomplete="off"
+                oninput="this.value = this.value.toUpperCase()">
+
+            <input type="text" id="inp-nrp" class="inp-login" placeholder="NRP Karyawan" autocomplete="off"
+                oninput="this.value = this.value.toUpperCase()">
+
+            <input type="text" id="inp-code" class="inp-login" placeholder="Kode Ujian" autocomplete="off"
+                oninput="this.value = this.value.toUpperCase()">
+
+            <div id="login-controls">
+                <button id="btn-login" class="btn-modal btn-teal" style="width:100%; padding:15px; font-size:1.1rem;"
+                    onclick="doLogin()">MULAI UJIAN</button>
+
+                <div id="loading-verify">
+                    <div class="dot-spinner">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                    <p style="color:#666;">Memverifikasi data...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-layer">
+        <nav id="sidebar">
+            <div class="sidebar-header-teal">
+                <div class="header-logo-row">
+                    <img src="https://github.com/jokosaptono17/SHE_LandingPage/blob/main/ASTO.png?raw=true" alt="Logo"
+                        class="custom-logo-header" onerror="this.style.display='none'">
+                </div>
+                <div style="color: #00878F;" class="cert-text-box">CERTFICATION</div>
+                <div class="header-divider"></div>
+                <div class="timer-wrapper">
+                    <span
+                        style="font-size:0.85rem; font-weight:600; letter-spacing:4px; opacity:0.9; margin-bottom:8px; color: #00878F;"
+                        class="cert-text-box">TIME
+                        LEFT
+                    </span>
+                    <div>=====================</div>
+                    <span id="timer" class="timer-val">00:00:00</span>
+
+                </div>
+            </div>
+            <div class="sidebar-nav-content">
+                <div class="nav-buttons-grid" id="nav-grid"></div>
+            </div>
+        </nav>
+
+        <main id="main-area">
+            <div style="padding: 20px 25px; border-top: 1px solid #eee; text-align: center;">
+                <button id="dark-mode-toggle" class="btn-modal btn-grey" style="width: 100%; padding: 7px;">
+                    <span id="dark-mode-text">Aktifkan Mode Malam</span> 🌙
+                </button>
+            </div>
+            <div class="q-card">
+                <div style="color:#aaa; font-weight:700; letter-spacing:1.5px; margin-bottom:25px;">SOAL <span
+                        id="q-idx">1</span> DARI <span id="q-total">10</span></div>
+                <div>
+                    <span style="font-size:0.9rem; color:#777; margin-right:10px;">Ukuran Teks:</span>
+                    <button class="btn-modal btn-grey font-size-btn" data-size="small"
+                        style="padding: 5px 10px; font-size: 0.8rem;">A-</button>
+                    <button class="btn-modal btn-teal font-size-btn" data-size="medium"
+                        style="padding: 5px 10px; font-size: 0.9rem;">A</button>
+                    <button class="btn-modal btn-grey font-size-btn" data-size="large"
+                        style="padding: 5px 10px; font-size: 1rem;">A+</button>
+                </div>
+                <div id="q-img-wrap"><img id="q-img-el" src=""></div>
+                <div class="q-text" id="q-txt">Loading...</div>
+                <div id="opt-wrap"></div>
+            </div>
+            <button id="btn-prev" class="nav-arrow" onclick="move(-1)">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                </svg>
+            </button>
+            <button id="btn-next" class="nav-arrow" onclick="move(1)">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" />
+                </svg>
+            </button>
+            <button id="btn-finish" onclick="askFinish()">SELESAI UJIAN</button>
+        </main>
+    </div>
+
+    <script>
+        // =========================================
+        // WAJIB GANTI URL INI DENGAN DEPLOY TERBARU!
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwi8KRUhQBkq11YQp5QijrRLO7RSy3yviLgDZpky3tMMc_pu_c4j46nbYcIfReQqVtJ/exec';
+        // =========================================
+
+        let st = { q: [], ans: [], i: 0, nm: '', nrp: '', cd: '', tm: null, v: 0 };
+
+        // ... di dalam blok <script> ...
+
+        function disableKeys() {
+            document.onkeydown = function (e) {
+                // Mencegah PrtSc (Print Screen)
+                if (e.key === 'PrintScreen' || e.key === 'p' && e.ctrlKey) {
+                    alert('Aksi screenshot tidak diizinkan selama ujian.');
+                    return false;
+                }
+
+                // Mencegah F12 (Developer Tools)
+                if (e.key === 'F12') {
+                    alert('Akses Developer Tools diblokir.');
+                    return false;
+                }
+
+                // Mencegah Ctrl+U (View Source)
+                if (e.ctrlKey && e.key === 'u') {
+                    alert('Melihat source code diblokir.');
+                    return false;
+                }
+
+                // Mencegah Ctrl+S (Save Page)
+                if (e.ctrlKey && e.key === 's') {
+                    alert('Menyimpan halaman diblokir.');
+                    return false;
+                }
+            };
+        }
+
+        // Fungsi untuk menangani Dark Mode
+        // ... di dalam blok <script> ...
+
+
+        // Fungsi untuk menangani Dark Mode
+        function toggleDarkMode() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDarkMode = body.classList.contains('dark-mode');
+
+            // Simpan preferensi pengguna ke Local Storage
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+
+            // Update teks tombol
+            document.getElementById('dark-mode-text').innerText = isDarkMode ? 'Nonaktifkan Mode Malam' : 'Aktifkan Mode Malam';
+        }
+
+        // Terapkan preferensi mode malam saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            // ... (kode lain di sini)
+
+            // Inisialisasi Dark Mode
+            const savedMode = localStorage.getItem('darkMode');
+            const toggleBtn = document.getElementById('dark-mode-toggle');
+
+            if (savedMode === 'enabled') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('dark-mode-text').innerText = 'Nonaktifkan Mode Malam';
+            }
+
+            // Tambahkan event listener ke tombol toggle
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', toggleDarkMode);
+            }
+        });
+
+        // ... fungsi doLogin(), init(), load(), dll.
+
+        // 
+        // ... di dalam blok <script> ...
+
+        function setFontSize(size) {
+            const qCard = document.querySelector('.q-card');
+            // Hapus semua kelas ukuran font yang mungkin ada
+            qCard.classList.remove('font-small', 'font-medium', 'font-large');
+
+            // Tambahkan kelas baru
+            if (size !== 'medium') { // Jika bukan medium (default)
+                qCard.classList.add(`font-${size}`);
+            }
+
+            // Perbarui status tombol aktif
+            document.querySelectorAll('.font-size-btn').forEach(btn => {
+                btn.classList.remove('btn-teal');
+                btn.classList.add('btn-grey');
+                if (btn.getAttribute('data-size') === size) {
+                    btn.classList.remove('btn-grey');
+                    btn.classList.add('btn-teal');
+                }
+            });
+
+            // Simpan preferensi
+            localStorage.setItem('fontSize', size);
+        }
+
+        // ... di dalam document.addEventListener('DOMContentLoaded', () => { ... })
+
+        // Inisialisasi Font Size
+        const savedFontSize = localStorage.getItem('fontSize') || 'medium';
+        setFontSize(savedFontSize); // Panggil fungsi inisialisasi
+
+        // Tambahkan event listener untuk tombol font
+        document.querySelectorAll('.font-size-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                setFontSize(this.getAttribute('data-size'));
+            });
+        });
+
+        // ...
+
+        function modal(ti, msg, type, btns) {
+            const ico = { ok: '<span style="color:var(--col-success)">&#10004;</span>', err: '<span style="color:var(--col-danger)">&#10006;</span>', warn: '<span style="color:#F39C12">&#9888;</span>' };
+            document.getElementById('modal-ico').innerHTML = `<span class="modal-icon">${ico[type] || ''}</span>`;
+            document.getElementById('modal-ti').innerText = ti;
+            document.getElementById('modal-msg').innerHTML = msg;
+            document.getElementById('modal-btns').innerHTML = btns;
+            document.getElementById('modal-overlay').classList.add('show');
+        }
+        function closeM() { document.getElementById('modal-overlay').classList.remove('show'); }
+        function alertM(t, m, ty = 'warn', cb = null) {
+            modal(t, m, ty, `<button class="btn-modal btn-teal" id="mok">OK</button>`);
+            document.getElementById('mok').onclick = () => { closeM(); if (cb) cb(); };
+        }
+
+        // ... (Baris 380 - 418 di <script>)
+
+        function doLogin() {
+            // AMBIL VALUE NAMA, NRP, DAN KODE
+            const n = document.getElementById('inp-name').value.trim();
+            const nr = document.getElementById('inp-nrp').value.trim();
+            const c = document.getElementById('inp-code').value.trim();
+
+            if (!n || !nr || !c) return alertM("Gagal", "Nama, NRP, dan Kode wajib diisi!", 'err');
+
+            // START: KODE BARU UNTUK SPINNER
+            document.getElementById('btn-login').style.display = 'none';
+            document.getElementById('loading-verify').style.display = 'flex';
+            // END: KODE BARU UNTUK SPINNER
+
+            // PERBAIKAN KRUSIAL V7.1: Kirim Nama dan NRP ke handleLogin()
+            const dataToSend = {
+                action: 'login',
+                nama: n,    // <--- KIRIM NAMA
+                nrp: nr,    // <--- KIRIM NRP
+                kode: c     // <--- KIRIM KODE
+            };
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(dataToSend)
+            })
+                .then(r => r.json()).then(d => {
+                    if (d.status === 'success') {
+                        st.nm = n; st.nrp = nr; st.cd = c; // SIMPAN NRP KE STATE
+                        st.q = d.questions;
+                        st.ans = new Array(d.questions.length).fill(null);
+
+                        // --- START PERUBAHAN V7.5 ---
+                        // TANGKAP DURASI DARI SERVER (handleLogin)
+                        st.duration = d.duration; // <--- BARIS PENTING: Durasi disimpan ke st.duration
+                        // --- END PERUBAHAN V7.5 ---
+
+                        document.getElementById('login-layer').style.display = 'none';
+                        document.getElementById('app-layer').style.display = 'flex';
+                        document.getElementById('q-total').innerText = st.q.length;
+                        init();
+                    } else { alertM("Login Gagal", d.message, 'err'); resetL(); }
+                }).catch(() => { alertM("Error", "Gagal koneksi server.", 'err'); resetL(); });
+        }
+        // ... (Lanjutkan dengan fungsi resetL() dan seterusnya)
+        function resetL() {
+            // START: KODE BARU UNTUK SPINNER
+            document.getElementById('btn-login').style.display = 'block';
+            document.getElementById('loading-verify').style.display = 'none';
+            // END: KODE BARU UNTUK SPINNER
+        }
+        function init() {
+            const g = document.getElementById('nav-grid');
+            st.q.forEach((_, i) => {
+                const b = document.createElement('button'); b.className = 'nav-dot'; b.id = 'dot-' + i; b.innerText = i + 1;
+                b.onclick = () => load(i); g.appendChild(b);
+            });
+
+            load(0);
+
+            // --- START PERUBAHAN V7.5 ---
+            // Mengganti nilai hardcode 5400 dengan durasi dinamis dari server
+            timer(st.duration);
+            // --- END PERUBAHAN V7.5 ---
+
+            // index.html, di bagian atas blok <script>
+            // ...
+
+            disableKeys(); // <--- Panggil di sini agar aktif sejak awal
+            // ...
+
+            secure();
+            window.onbeforeunload = () => "Ujian sedang berlangsung!";
+        }
+        function load(i) {
+            st.i = i;
+            document.getElementById('q-idx').innerText = i + 1;
+            document.getElementById('q-txt').innerText = st.q[i].text;
+            const img = document.getElementById('q-img-wrap');
+            if (st.q[i].image && st.q[i].image.length > 5) { document.getElementById('q-img-el').src = st.q[i].image; img.style.display = 'block'; }
+            else { img.style.display = 'none'; }
+            const opt = document.getElementById('opt-wrap'); opt.innerHTML = '';
+            ['A', 'B', 'C', 'D'].forEach((L, idx) => {
+                opt.innerHTML += `<div class="opt-box ${st.ans[i] === L ? 'selected' : ''}" onclick="answ(${i},'${L}')"><div class="opt-radio"></div><span>${st.q[i].options[idx]}</span></div>`;
+            });
+            upd();
+        }
+        function answ(i, v) { st.ans[i] = v; load(i); }
+        function move(d) { load(st.i + d); }
+        function upd() {
+            st.q.forEach((_, i) => {
+                const el = document.getElementById('dot-' + i);
+                el.className = `nav-dot ${i === st.i ? 'active' : ''} ${st.ans[i] ? 'answered' : ''}`;
+            });
+            document.getElementById('btn-prev').disabled = st.i === 0;
+            const last = st.i === st.q.length - 1;
+            document.getElementById('btn-next').style.display = last ? 'none' : 'flex';
+            document.getElementById('btn-finish').style.display = last ? 'block' : 'none';
+        }
+        function timer(s) {
+            st.tm = setInterval(() => {
+                s--; const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+                document.getElementById('timer').innerText = `${h < 10 ? '0' : ''}${h}:${m < 10 ? '0' : ''}${m}:${sec < 10 ? '0' : ''}${sec}`;
+                if (s <= 0) { clearInterval(st.tm); alertM("WAKTU HABIS", "Otomatis dikumpulkan.", 'warn', () => sub(true)); }
+            }, 1000);
+        }
+        function secure() {
+            document.documentElement.requestFullscreen().catch(() => { });
+            document.addEventListener("visibilitychange", () => { if (document.hidden) warn("Keluar dari aplikasi."); });
+            window.onblur = () => { setTimeout(() => { if (!document.hasFocus()) warn("Kehilangan fokus."); }, 1000); };
+            document.oncontextmenu = e => e.preventDefault();
+            document.onkeydown = e => { if (["F12", "F5", "PrintScreen"].includes(e.key) || (e.ctrlKey && ["r", "c", "v", "x"].includes(e.key))) e.preventDefault(); };
+        }
+        function warn(m) {
+            st.v++; if (st.v >= 4) alertM("DISKUALIFIKASI", "Terlalu banyak pelanggaran.", 'err', () => sub(true));
+            else alertM("PERINGATAN", `${m}<br>Pelanggaran: ${st.v}/3`, 'err');
+        }
+        function askFinish() {
+            const n = st.ans.filter(a => a === null).length;
+            modal("Konfirmasi Selesai", n > 0 ? `Masih ada <b>${n}</b> soal kosong. Yakin kumpulkan?` : "Yakin ingin mengakhiri ujian?", 'warn',
+                `<button class="btn-modal btn-grey" onclick="closeM()">BATAL</button><button class="btn-modal btn-red" onclick="sub(false)">YA, SELESAI</button>`);
+        }
+        function sub(auto) {
+            closeM(); clearInterval(st.tm); window.onblur = null; document.onvisibilitychange = null;
+            document.getElementById('app-layer').style.opacity = '0.5'; document.getElementById('app-layer').style.pointerEvents = 'none';
+            let sc = 0; st.q.forEach((q, i) => { if (st.ans[i] === q.correctKey) sc++; });
+            // KIRIM NRP JUGA KE SERVER
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'submit', nama: st.nm, nrp: st.nrp, kode: st.cd, benar: sc, total: st.q.length }) })
+                .then(r => r.json()).then(d => alertM("UJIAN SELESAI", `Nilai Anda: <b>${(sc / st.q.length * 100).toFixed(1)}</b>`, 'ok', () => location.reload()))
+                .catch(() => { alertM("Gagal Kirim", "Coba tekan SELESAI lagi.", 'err'); document.getElementById('app-layer').style.opacity = '1'; document.getElementById('app-layer').style.pointerEvents = 'all'; });
+        }
+    </script>
+</body>
+
+</html>
