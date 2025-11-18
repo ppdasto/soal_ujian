@@ -115,63 +115,101 @@
         /* =========================================
    LOGIN LAYER (MODIFIKASI: DUA KOLOM)
    ========================================= */
-        #login-layer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--col-bg);
-            /* Latar belakang aplikasi */
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-            /* Tambahkan padding agar tidak mentok */
-        }
+/* =========================================
+   LOGIN LAYER (MODIFIKASI: DUA KOLOM)
+   ========================================= */
+#login-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--col-bg); 
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px; 
+}
 
-        .login-container {
-            background: white;
-            display: flex;
-            width: 100%;
-            max-width: 1000px;
-            /* Lebar maksimum container */
-            height: 700px;
-            /* Tinggi tetap */
-            border-radius: 20px;
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
-            overflow: hidden;
-            /* Penting untuk radius */
-        }
+.login-container {
+    background: white;
+    display: flex;
+    width: 100%;
+    max-width: 900px; /* <--- PENTING: Dikecilkan dari 1000px menjadi 900px */
+    height: 600px; /* <--- PENTING: Dikecilkan dari 700px menjadi 600px */
+    border-radius: 20px;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+    overflow: hidden; 
+}
 
-        /* SISI KIRI: FORM LOGIN */
-        .login-box {
-            flex: 1;
-            /* Ambil 1 bagian (misal 40% - 50%) */
-            padding: 60px 50px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: #ffffff;
-        }
+/* SISI KIRI: FORM LOGIN */
+.login-box {
+    flex: 1; 
+    padding: 40px 40px; /* <--- Padding dikurangi agar lebih ringkas */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: #ffffff;
+}
 
-        /* SISI KANAN: WELCOME & BRANDING */
-        .welcome-box {
-            flex: 1.2;
-            /* Ambil bagian lebih besar (misal 60% - 50%) */
-            background: linear-gradient(135deg, var(--col-teal), #00A6B2);
-            color: white;
-            padding: 50px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-        }
+/* SISI KANAN: WELCOME & BRANDING */
+.welcome-box {
+    flex: 1.2; 
+    background: linear-gradient(135deg, var(--col-teal), #00A6B2);
+    color: white;
+    padding: 40px; /* <--- Padding dikurangi */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+
+/* --- MEDIA QUERY KHUSUS TABLET (Layar Menengah: 769px hingga 1024px) --- */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .login-container {
+        /* Sedikit lebih kecil untuk memastikan muat di tablet */
+        max-width: 750px; 
+        height: 550px; 
+    }
+
+    .welcome-box h1 {
+        font-size: 2rem; /* Ukuran font dikecilkan */
+    }
+
+    .welcome-box p {
+        font-size: 1rem; /* Ukuran font dikecilkan */
+    }
+}
+
+/* --- MEDIA QUERY MOBILE (di bawah 768px, yang sudah ada) --- */
+@media (max-width: 768px) {
+    #login-layer {
+        padding: 20px;
+        align-items: flex-start; 
+    }
+    
+    .login-container {
+        height: auto; 
+        flex-direction: column; 
+        max-width: 100%;
+        box-shadow: none; /* Hilangkan shadow di mobile untuk tampilan lebih bersih */
+    }
+
+    .welcome-box {
+        display: none; 
+    }
+    
+    .login-box {
+        width: 100%;
+        padding: 35px 25px;
+        border-radius: 20px; 
+    }
+}
 
         .welcome-box h1 {
             font-size: 2.8rem;
@@ -1190,3 +1228,4 @@
 </body>
 
 </html>
+
