@@ -112,36 +112,104 @@
         }
 
         /* LOGIN LAYER */
+        /* =========================================
+   LOGIN LAYER (MODIFIKASI: DUA KOLOM)
+   ========================================= */
         #login-layer {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--col-teal);
+            background: var(--col-bg);
+            /* Latar belakang aplikasi */
             z-index: 1000;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 30px;
+            /* Tambahkan padding agar tidak mentok */
         }
 
-        .login-box {
+        .login-container {
             background: white;
-            padding: 45px 35px;
-            border-radius: 16px;
+            display: flex;
             width: 100%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            /* Lebar maksimum container */
+            height: 700px;
+            /* Tinggi tetap */
+            border-radius: 20px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            /* Penting untuk radius */
         }
 
+        /* SISI KIRI: FORM LOGIN */
+        .login-box {
+            flex: 1;
+            /* Ambil 1 bagian (misal 40% - 50%) */
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: #ffffff;
+        }
+
+        /* SISI KANAN: WELCOME & BRANDING */
+        .welcome-box {
+            flex: 1.2;
+            /* Ambil bagian lebih besar (misal 60% - 50%) */
+            background: linear-gradient(135deg, var(--col-teal), #00A6B2);
+            color: white;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .welcome-box h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .welcome-box p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .welcome-box img {
+            max-width: 80%;
+            height: auto;
+            margin-top: 30px;
+            opacity: 0.9;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+        }
+
+        .welcome-note {
+            position: absolute;
+            bottom: 30px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* INPUT & TOMBOL */
         .inp-login {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             margin-bottom: 20px;
             border: 2px solid #eef2f7;
-            border-radius: 10px;
+            border-radius: 12px;
+            /* Dibuat sedikit lebih bulat */
             font-size: 16px;
             outline: none;
             transition: 0.3s;
@@ -151,6 +219,37 @@
         .inp-login:focus {
             border-color: var(--col-teal);
             background: white;
+            box-shadow: 0 0 0 3px var(--col-teal-faint);
+        }
+
+        /* RESPONSIF MOBILE: Satu Kolom */
+        @media (max-width: 768px) {
+            #login-layer {
+                padding: 20px;
+                align-items: flex-start;
+                /* Geser ke atas di mobile */
+            }
+
+            .login-container {
+                height: auto;
+                /* Tinggi disesuaikan konten */
+                flex-direction: column;
+                /* Ubah menjadi kolom vertikal */
+                max-width: 100%;
+            }
+
+            .welcome-box {
+                display: none;
+                /* Sembunyikan welcome box di mobile */
+            }
+
+            .login-box {
+                width: 100%;
+                padding: 35px 25px;
+                border-radius: 20px;
+                /* Pastikan radius tetap ada di mobile */
+                box-shadow: none;
+            }
         }
 
         /* APP LAYOUT */
@@ -709,35 +808,56 @@
     </div>
 
     <div id="login-layer">
-        <div class="login-box">
-            <div class="header-logo-row">
-                <img src="https://github.com/jokosaptono17/PLANTASTO/blob/main/LOGO%20PPD%202021.png?raw=true"
-                    alt="Logo" class="custom-logo-header" onerror="this.style.display='none'">
-            </div>
-            <h2 style="color:var(--col-teal); margin-bottom:30px; font-weight:800; font-size:2rem;">PLANT ASTO EXAM</h2>
+        <div class="login-container">
 
-            <input type="text" id="inp-name" class="inp-login" placeholder="Nama Lengkap" autocomplete="off"
-                oninput="this.value = this.value.toUpperCase()">
+            <div class="login-box">
+                <div class="header-logo-row">
+                    <img src="https://github.com/jokosaptono17/PLANTASTO/blob/main/LOGO%20PPD%202021.png?raw=true"
+                        alt="Logo" class="custom-logo-header" style="max-width: 120px; margin-bottom: 10px;"
+                        onerror="this.style.display='none'">
+                </div>
+                <h2 style="color:var(--col-teal); margin-bottom:30px; font-weight:800; font-size:2rem;">PLANT ASTO EXAM
+                </h2>
 
-            <input type="text" id="inp-nrp" class="inp-login" placeholder="NRP Karyawan" autocomplete="off"
-                oninput="this.value = this.value.toUpperCase()">
+                <input type="text" id="inp-name" class="inp-login" placeholder="Nama Lengkap" autocomplete="off"
+                    oninput="this.value = this.value.toUpperCase()">
 
-            <input type="text" id="inp-code" class="inp-login" placeholder="Kode Ujian" autocomplete="off"
-                oninput="this.value = this.value.toUpperCase()">
+                <input type="text" id="inp-nrp" class="inp-login" placeholder="NRP Karyawan" autocomplete="off"
+                    oninput="this.value = this.value.toUpperCase()">
 
-            <div id="login-controls">
-                <button id="btn-login" class="btn-modal btn-teal" style="width:100%; padding:15px; font-size:1.1rem;"
-                    onclick="doLogin()">MULAI UJIAN</button>
+                <input type="text" id="inp-code" class="inp-login" placeholder="Kode Ujian" autocomplete="off"
+                    oninput="this.value = this.value.toUpperCase()">
 
-                <div id="loading-verify">
-                    <div class="dot-spinner">
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
+                <div id="login-controls" style="width: 100%;">
+                    <button id="btn-login" class="btn-modal btn-teal"
+                        style="width:100%; padding:18px; font-size:1.2rem; margin-top: 10px;" onclick="doLogin()">MULAI
+                        UJIAN</button>
+
+                    <div id="loading-verify">
+                        <div class="dot-spinner">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <p style="color:#666;">Memverifikasi data...</p>
                     </div>
-                    <p style="color:#666;">Memverifikasi data...</p>
                 </div>
             </div>
+
+            <div class="welcome-box">
+                <h1>WELCOME</h1>
+                <p>Sistem Ujian Sertifikasi Plant Asto. Silakan persiapkan diri Anda dan pastikan jaringan internet
+                    stabil sebelum memulai ujian.</p>
+
+                <img src="https://github.com/jokosaptono17/SHE_LandingPage/blob/main/ASTO.png?raw=true" alt="Plant Asto"
+                    style="max-width: 250px;">
+
+                <div class="welcome-note">
+                    ©
+                    <?= new Date().getFullYear() ?> Plant Asto Certification System
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -1070,4 +1190,3 @@
 </body>
 
 </html>
-
