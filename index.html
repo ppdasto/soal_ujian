@@ -1208,7 +1208,7 @@
         }
         function warn(m) {
             st.v++; if (st.v >= 4) alertM("DISKUALIFIKASI", "Terlalu banyak pelanggaran.", 'err', () => sub(true));
-            else alertM("PERINGATAN", `${m}<br>Pelanggaran: ${st.v}/3`, 'err');
+            else alertM("PERINGATAN", `${m}<br>Pelanggaran: ${st.v}/5`, 'err');
         }
         function askFinish() {
             const n = st.ans.filter(a => a === null).length;
@@ -1228,4 +1228,5 @@
 </body>
 
 </html>
+
 
