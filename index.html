@@ -115,101 +115,108 @@
         /* =========================================
    LOGIN LAYER (MODIFIKASI: DUA KOLOM)
    ========================================= */
-/* =========================================
+        /* =========================================
    LOGIN LAYER (MODIFIKASI: DUA KOLOM)
    ========================================= */
-#login-layer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--col-bg); 
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 30px; 
-}
+        #login-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--col-bg);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
 
-.login-container {
-    background: white;
-    display: flex;
-    width: 100%;
-    max-width: 900px; /* <--- PENTING: Dikecilkan dari 1000px menjadi 900px */
-    height: 600px; /* <--- PENTING: Dikecilkan dari 700px menjadi 600px */
-    border-radius: 20px;
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
-    overflow: hidden; 
-}
+        .login-container {
+            background: white;
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            /* <--- PENTING: Dikecilkan dari 1000px menjadi 900px */
+            height: 600px;
+            /* <--- PENTING: Dikecilkan dari 700px menjadi 600px */
+            border-radius: 20px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
 
-/* SISI KIRI: FORM LOGIN */
-.login-box {
-    flex: 1; 
-    padding: 40px 40px; /* <--- Padding dikurangi agar lebih ringkas */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    background: #ffffff;
-}
+        /* SISI KIRI: FORM LOGIN */
+        .login-box {
+            flex: 1;
+            padding: 40px 40px;
+            /* <--- Padding dikurangi agar lebih ringkas */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: #ffffff;
+        }
 
-/* SISI KANAN: WELCOME & BRANDING */
-.welcome-box {
-    flex: 1.2; 
-    background: linear-gradient(135deg, var(--col-teal), #00A6B2);
-    color: white;
-    padding: 40px; /* <--- Padding dikurangi */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    position: relative;
-}
+        /* SISI KANAN: WELCOME & BRANDING */
+        .welcome-box {
+            flex: 1.2;
+            background: linear-gradient(135deg, var(--col-teal), #00A6B2);
+            color: white;
+            padding: 40px;
+            /* <--- Padding dikurangi */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
 
-/* --- MEDIA QUERY KHUSUS TABLET (Layar Menengah: 769px hingga 1024px) --- */
-@media (min-width: 769px) and (max-width: 1024px) {
-    .login-container {
-        /* Sedikit lebih kecil untuk memastikan muat di tablet */
-        max-width: 750px; 
-        height: 550px; 
-    }
+        /* --- MEDIA QUERY KHUSUS TABLET (Layar Menengah: 769px hingga 1024px) --- */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .login-container {
+                /* Sedikit lebih kecil untuk memastikan muat di tablet */
+                max-width: 750px;
+                height: 550px;
+            }
 
-    .welcome-box h1 {
-        font-size: 2rem; /* Ukuran font dikecilkan */
-    }
+            .welcome-box h1 {
+                font-size: 2rem;
+                /* Ukuran font dikecilkan */
+            }
 
-    .welcome-box p {
-        font-size: 1rem; /* Ukuran font dikecilkan */
-    }
-}
+            .welcome-box p {
+                font-size: 1rem;
+                /* Ukuran font dikecilkan */
+            }
+        }
 
-/* --- MEDIA QUERY MOBILE (di bawah 768px, yang sudah ada) --- */
-@media (max-width: 768px) {
-    #login-layer {
-        padding: 20px;
-        align-items: flex-start; 
-    }
-    
-    .login-container {
-        height: auto; 
-        flex-direction: column; 
-        max-width: 100%;
-        box-shadow: none; /* Hilangkan shadow di mobile untuk tampilan lebih bersih */
-    }
+        /* --- MEDIA QUERY MOBILE (di bawah 768px, yang sudah ada) --- */
+        @media (max-width: 768px) {
+            #login-layer {
+                padding: 20px;
+                align-items: flex-start;
+            }
 
-    .welcome-box {
-        display: none; 
-    }
-    
-    .login-box {
-        width: 100%;
-        padding: 35px 25px;
-        border-radius: 20px; 
-    }
-}
+            .login-container {
+                height: auto;
+                flex-direction: column;
+                max-width: 100%;
+                box-shadow: none;
+                /* Hilangkan shadow di mobile untuk tampilan lebih bersih */
+            }
+
+            .welcome-box {
+                display: none;
+            }
+
+            .login-box {
+                width: 100%;
+                padding: 35px 25px;
+                border-radius: 20px;
+            }
+        }
 
         .welcome-box h1 {
             font-size: 2.8rem;
@@ -400,6 +407,78 @@
             width: 100%;
             max-width: 950px;
             margin: auto 0;
+        }
+
+        /* =========================================
+   PERBAIKAN: CSS LOADER GAMBAR
+   ========================================= */
+        #q-img-wrap {
+            position: relative;
+            min-height: 200px;
+            /* Tinggi minimum agar layout tidak lompat */
+            display: none;
+            /* Default sembunyi */
+            background: #f8f9fa;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Spinner Loading */
+        .img-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            /* Default sembunyi, dikontrol JS */
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .spinner-circle {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e0e0e0;
+            border-top: 5px solid var(--col-teal);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 600;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Gambar Soal */
+        #q-img-el {
+            max-width: 100%;
+            max-height: 450px;
+            display: none;
+            /* Default sembunyi, hanya muncul jika selesai load */
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 5;
+        }
+
+        /* Pastikan gambar hidden saat loading */
+        .img-hidden {
+            display: none !important;
         }
 
         .q-text {
@@ -942,7 +1021,14 @@
                     <button class="btn-modal btn-grey font-size-btn" data-size="large"
                         style="padding: 5px 10px; font-size: 1rem;">A+</button>
                 </div>
-                <div id="q-img-wrap"><img id="q-img-el" src=""></div>
+                <div id="q-img-wrap">
+                    <div id="q-loader-el" class="img-loader">
+                        <div class="spinner-circle"></div>
+                        <div class="loading-text">Memuat Gambar...</div>
+                    </div>
+
+                    <img id="q-img-el" src="" alt="Soal Image">
+                </div>
                 <div class="q-text" id="q-txt">Loading...</div>
                 <div id="opt-wrap"></div>
             </div>
@@ -1169,16 +1255,63 @@
         }
         function load(i) {
             st.i = i;
+
+            // 1. Update UI Teks Soal & Nomor
             document.getElementById('q-idx').innerText = i + 1;
             document.getElementById('q-txt').innerText = st.q[i].text;
-            const img = document.getElementById('q-img-wrap');
-            if (st.q[i].image && st.q[i].image.length > 5) { document.getElementById('q-img-el').src = st.q[i].image; img.style.display = 'block'; }
-            else { img.style.display = 'none'; }
-            const opt = document.getElementById('opt-wrap'); opt.innerHTML = '';
+
+            // ============================================================
+            // 2. LOGIKA GAMBAR ANTI-GHOSTING (REVISI TOTAL)
+            // ============================================================
+            const wrap = document.getElementById('q-img-wrap');
+            const imgEl = document.getElementById('q-img-el');
+            const loader = document.getElementById('q-loader-el');
+
+            const currentImgUrl = st.q[i].image;
+
+            // LANGKAH A: RESET STATE (Wajib dilakukan pertama kali)
+            // Sembunyikan gambar SEGERA agar gambar lama tidak terlihat (Ghosting hilang)
+            imgEl.style.display = 'none';
+            imgEl.src = ''; // Kosongkan src sementara agar browser memutus render lama
+            loader.style.display = 'none'; // Reset loader
+            wrap.style.display = 'none';   // Reset wrapper
+
+            // LANGKAH B: CEK APAKAH ADA GAMBAR
+            if (currentImgUrl && currentImgUrl.length > 5) {
+                // B1. Tampilkan Wrapper & Loader
+                wrap.style.display = 'flex';
+                loader.style.display = 'flex';
+
+                // B2. Buat objek Image baru di memori untuk pre-loading (Opsional tapi lebih stabil)
+                // Atau langsung tembak ke elemen DOM
+                imgEl.src = currentImgUrl;
+
+                // B3. Event Listener: Hanya tampilkan gambar jika SUDAH SELESAI download
+                imgEl.onload = function () {
+                    loader.style.display = 'none'; // Sembunyikan loader
+                    imgEl.style.display = 'block'; // Munculkan gambar baru
+                };
+
+                // B4. Handle Error (Jika gambar rusak/link mati)
+                imgEl.onerror = function () {
+                    loader.style.display = 'none';
+                    // Tampilkan pesan error text di wrapper jika mau, atau biarkan kosong
+                };
+            }
+            // Jika tidak ada gambar, wrapper tetap display: none (dari Langkah A)
+
+            // ============================================================
+
+            // 3. Render Opsi Jawaban (Sama seperti sebelumnya)
+            const opt = document.getElementById('opt-wrap');
+            opt.innerHTML = '';
             ['A', 'B', 'C', 'D'].forEach((L, idx) => {
-                opt.innerHTML += `<div class="opt-box ${st.ans[i] === L ? 'selected' : ''}" onclick="answ(${i},'${L}')"><div class="opt-radio"></div><span>${st.q[i].options[idx]}</span></div>`;
+                // Mencegah error jika opsi kosong di database
+                const val = st.q[i].options[idx] || '';
+                opt.innerHTML += `<div class="opt-box ${st.ans[i] === L ? 'selected' : ''}" onclick="answ(${i},'${L}')"><div class="opt-radio"></div><span>${val}</span></div>`;
             });
-            upd();
+
+            upd(); // Update tombol navigasi
         }
         function answ(i, v) { st.ans[i] = v; load(i); }
         function move(d) { load(st.i + d); }
@@ -1208,7 +1341,7 @@
         }
         function warn(m) {
             st.v++; if (st.v >= 4) alertM("DISKUALIFIKASI", "Terlalu banyak pelanggaran.", 'err', () => sub(true));
-            else alertM("PERINGATAN", `${m}<br>Pelanggaran: ${st.v}/5`, 'err');
+            else alertM("PERINGATAN", `${m}<br>Pelanggaran: ${st.v}/3`, 'err');
         }
         function askFinish() {
             const n = st.ans.filter(a => a === null).length;
@@ -1228,5 +1361,3 @@
 </body>
 
 </html>
-
-
