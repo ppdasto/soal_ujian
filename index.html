@@ -1339,28 +1339,75 @@
             document.oncontextmenu = e => e.preventDefault();
             document.onkeydown = e => { if (["F12", "F5", "PrintScreen"].includes(e.key) || (e.ctrlKey && ["r", "c", "v", "x"].includes(e.key))) e.preventDefault(); };
         }
-        function warn(m) {
-            st.v++; if (st.v >= 4) alertM("DISKUALIFIKASI", "Terlalu banyak pelanggaran.", 'err', () => sub(true));
-            else alertM("PERINGATAN", `${m}<br>Pelanggaran: ${st.v}/8`, 'err');
-        }
+       // Logika Baru: Peringatan bertingkat tanpa Diskualifikasi
+function warn(m) {
+    st.v++; // Tambah counter pelanggaran
+    
+    // Peringatan tahap awal (1 sampai 9 kali)
+    if (st.v < 10) {
+        alertM(
+            "PERINGATAN FOKUS", 
+            `${m}<br>Terdeteksi perpindahan tab/layar.<br>Pelanggaran ke: <b>${st.v}</b>`, 
+            'warn'
+        );
+    } 
+    // Peringatan ke-10 (Peringatan Terakhir yang muncul popup)
+    else if (st.v === 10) {
+        alertM(
+            "PERINGATAN TERAKHIR", 
+            `Anda telah melakukan <b>10 kali</b> pelanggaran fokus.<br>Sistem terus mencatat perilaku ini dan akan dilaporkan di hasil akhir.<br>Harap kerjakan dengan jujur!`, 
+            'err' // Tipe error agar warna merah
+        );
+    }
+    // Jika lebih dari 10, sistem diam saja (silent count) atau bisa alert kecil, 
+    // tapi sesuai request "system tetap berjalan" tanpa gangguan berlebih.
+    // Data st.v tetap bertambah di background untuk dikirim nanti.
+}
         function askFinish() {
             const n = st.ans.filter(a => a === null).length;
             modal("Konfirmasi Selesai", n > 0 ? `Masih ada <b>${n}</b> soal kosong. Yakin kumpulkan?` : "Yakin ingin mengakhiri ujian?", 'warn',
                 `<button class="btn-modal btn-grey" onclick="closeM()">BATAL</button><button class="btn-modal btn-red" onclick="sub(false)">YA, SELESAI</button>`);
         }
-        function sub(auto) {
-            closeM(); clearInterval(st.tm); window.onblur = null; document.onvisibilitychange = null;
-            document.getElementById('app-layer').style.opacity = '0.5'; document.getElementById('app-layer').style.pointerEvents = 'none';
-            let sc = 0; st.q.forEach((q, i) => { if (st.ans[i] === q.correctKey) sc++; });
-            // KIRIM NRP JUGA KE SERVER
-            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'submit', nama: st.nm, nrp: st.nrp, kode: st.cd, benar: sc, total: st.q.length }) })
-                .then(r => r.json()).then(d => alertM("UJIAN SELESAI", `Nilai Anda: <b>${(sc / st.q.length * 100).toFixed(1)}</b>`, 'ok', () => location.reload()))
-                .catch(() => { alertM("Gagal Kirim", "Coba tekan SELESAI lagi.", 'err'); document.getElementById('app-layer').style.opacity = '1'; document.getElementById('app-layer').style.pointerEvents = 'all'; });
-        }
+    function sub(auto) {
+    closeM(); 
+    clearInterval(st.tm); 
+    window.onblur = null; 
+    document.onvisibilitychange = null; // Matikan deteksi pelanggaran saat submit
+    
+    document.getElementById('app-layer').style.opacity = '0.5'; 
+    document.getElementById('app-layer').style.pointerEvents = 'none';
+    
+    let sc = 0; 
+    st.q.forEach((q, i) => { if (st.ans[i] === q.correctKey) sc++; });
+
+    // PERBAIKAN DI SINI: Menambahkan 'peringatan: st.v'
+    const dataKirim = {
+        action: 'submit',
+        nama: st.nm,
+        nrp: st.nrp,
+        kode: st.cd,
+        benar: sc,
+        total: st.q.length,
+        peringatan: st.v // <--- KIRIM JUMLAH PELANGGARAN
+    };
+
+    fetch(API_URL, { 
+        method: 'POST', 
+        body: JSON.stringify(dataKirim) 
+    })
+    .then(r => r.json())
+    .then(d => alertM("UJIAN SELESAI", `Nilai Anda: <b>${(sc / st.q.length * 100).toFixed(1)}</b>`, 'ok', () => location.reload()))
+    .catch(() => { 
+        alertM("Gagal Kirim", "Coba tekan SELESAI lagi.", 'err'); 
+        document.getElementById('app-layer').style.opacity = '1'; 
+        document.getElementById('app-layer').style.pointerEvents = 'all'; 
+    });
+}
     </script>
 </body>
 
 </html>
+
 
 
 
