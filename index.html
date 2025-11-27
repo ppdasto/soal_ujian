@@ -1396,7 +1396,7 @@ function warn(m) {
         body: JSON.stringify(dataKirim) 
     })
     .then(r => r.json())
-    .then(d => alertM("UJIAN SELESAI", `Nilai Anda: <b>${(sc / st.q.length * 100).toFixed(1)}</b>`, 'ok', () => location.reload()))
+    .then(d => alertM("UJIAN SELESAI", `Nilai Anda: YA RAHASIA,TERIMAKASIH`, 'ok', () => location.reload()))
     .catch(() => { 
         alertM("Gagal Kirim", "Coba tekan SELESAI lagi.", 'err'); 
         document.getElementById('app-layer').style.opacity = '1'; 
@@ -1407,6 +1407,7 @@ function warn(m) {
 </body>
 
 </html>
+
 
 
 
