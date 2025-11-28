@@ -8,16 +8,28 @@
     <title>PPD ASTO INNOVATION</title>
     <style>
         /* =========================================
-           SETTING GLOBAL & WARNA
+           1. SETTING GLOBAL & VARIABEL WARNA
            ========================================= */
         :root {
+            /* Warna Utama */
             --col-teal: #00878F;
             --col-teal-light: #62AEB2;
             --col-teal-faint: #E0F7FA;
             --col-bg: #DAE1E7;
             --col-danger: #E74C3C;
             --col-success: #2ECC71;
+
+            /* Dimensi */
             --sidebar-w: 320px;
+
+            /* Variabel Dark Mode (Default Light) */
+            --bg-body: var(--col-bg);
+            --bg-card: #ffffff;
+            --txt-main: #333333;
+            --txt-sec: #555555;
+            --border-opt: #f0f4f8;
+            --shadow-card: 0 15px 50px rgba(0, 0, 0, 0.08);
+            --shadow-nav: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
         * {
@@ -26,18 +38,143 @@
             padding: 0;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            /* Mencegah seleksi teks (anti-copas) */
+        }
+
+        /* PENGECUALIAN: Input harus bisa diseleksi agar bisa diketik/edit */
+        input,
+        textarea {
+            user-select: text !important;
+            -webkit-user-select: text !important;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: var(--col-bg);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-body);
             height: 100dvh;
+            /* Dynamic Viewport Height */
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            color: var(--txt-main);
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
-        /* MODAL POP-UP */
+        /* =========================================
+           2. FITUR ZOOM GAMBAR (LIGHTBOX)
+           ========================================= */
+        #zoom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 20000;
+            /* Layer paling atas */
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #zoom-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .zoom-header {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 20001;
+            gap: 20px;
+        }
+
+        .zoom-close-btn {
+            position: absolute;
+            right: 30px;
+            top: 0;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            line-height: 1;
+        }
+
+        .zoom-close-btn:hover {
+            background: var(--col-danger);
+            border-color: var(--col-danger);
+        }
+
+        .zoom-container {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            /* Scroll aktif jika di-zoom besar */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #img-zoomed {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            transition: transform 0.1s ease-out;
+            transform-origin: center center;
+            cursor: grab;
+        }
+
+        #img-zoomed:active {
+            cursor: grabbing;
+        }
+
+        /* Slider Zoom Control */
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 25px;
+            border-radius: 30px;
+            gap: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .zoom-label {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        input[type=range] {
+            width: 140px;
+            cursor: pointer;
+            accent-color: var(--col-teal);
+        }
+
+        /* =========================================
+           3. KOMPONEN UI (MODAL, BUTTONS)
+           ========================================= */
+        /* Modal Alert */
         #modal-overlay {
             position: fixed;
             top: 0;
@@ -45,7 +182,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(6px);
+            backdrop-filter: blur(5px);
             z-index: 9999;
             display: none;
             align-items: center;
@@ -60,7 +197,8 @@
         }
 
         #modal-box {
-            background: white;
+            background: var(--bg-card);
+            color: var(--txt-main);
             width: 90%;
             max-width: 420px;
             padding: 35px;
@@ -81,6 +219,7 @@
             display: block;
         }
 
+        /* Button Styles */
         .btn-modal {
             padding: 12px 35px;
             border-radius: 50px;
@@ -89,11 +228,12 @@
             font-size: 1rem;
             margin: 10px 5px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.2s;
         }
 
         .btn-modal:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .btn-teal {
@@ -111,13 +251,9 @@
             color: #555;
         }
 
-        /* LOGIN LAYER */
         /* =========================================
-   LOGIN LAYER (MODIFIKASI: DUA KOLOM)
-   ========================================= */
-        /* =========================================
-   LOGIN LAYER (MODIFIKASI: DUA KOLOM)
-   ========================================= */
+           4. HALAMAN LOGIN
+           ========================================= */
         #login-layer {
             position: fixed;
             top: 0;
@@ -137,19 +273,15 @@
             display: flex;
             width: 100%;
             max-width: 900px;
-            /* <--- PENTING: Dikecilkan dari 1000px menjadi 900px */
             height: 600px;
-            /* <--- PENTING: Dikecilkan dari 700px menjadi 600px */
             border-radius: 20px;
             box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
             overflow: hidden;
         }
 
-        /* SISI KIRI: FORM LOGIN */
         .login-box {
             flex: 1;
-            padding: 40px 40px;
-            /* <--- Padding dikurangi agar lebih ringkas */
+            padding: 40px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -158,64 +290,17 @@
             background: #ffffff;
         }
 
-        /* SISI KANAN: WELCOME & BRANDING */
         .welcome-box {
             flex: 1.2;
             background: linear-gradient(135deg, var(--col-teal), #00A6B2);
             color: white;
             padding: 40px;
-            /* <--- Padding dikurangi */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
             position: relative;
-        }
-
-        /* --- MEDIA QUERY KHUSUS TABLET (Layar Menengah: 769px hingga 1024px) --- */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .login-container {
-                /* Sedikit lebih kecil untuk memastikan muat di tablet */
-                max-width: 750px;
-                height: 550px;
-            }
-
-            .welcome-box h1 {
-                font-size: 2rem;
-                /* Ukuran font dikecilkan */
-            }
-
-            .welcome-box p {
-                font-size: 1rem;
-                /* Ukuran font dikecilkan */
-            }
-        }
-
-        /* --- MEDIA QUERY MOBILE (di bawah 768px, yang sudah ada) --- */
-        @media (max-width: 768px) {
-            #login-layer {
-                padding: 20px;
-                align-items: flex-start;
-            }
-
-            .login-container {
-                height: auto;
-                flex-direction: column;
-                max-width: 100%;
-                box-shadow: none;
-                /* Hilangkan shadow di mobile untuk tampilan lebih bersih */
-            }
-
-            .welcome-box {
-                display: none;
-            }
-
-            .login-box {
-                width: 100%;
-                padding: 35px 25px;
-                border-radius: 20px;
-            }
         }
 
         .welcome-box h1 {
@@ -247,18 +332,17 @@
             opacity: 0.7;
         }
 
-        /* INPUT & TOMBOL */
         .inp-login {
             width: 100%;
             padding: 16px;
             margin-bottom: 20px;
             border: 2px solid #eef2f7;
             border-radius: 12px;
-            /* Dibuat sedikit lebih bulat */
             font-size: 16px;
             outline: none;
             transition: 0.3s;
             background: #f8fafc;
+            color: #333;
         }
 
         .inp-login:focus {
@@ -267,37 +351,57 @@
             box-shadow: 0 0 0 3px var(--col-teal-faint);
         }
 
-        /* RESPONSIF MOBILE: Satu Kolom */
-        @media (max-width: 768px) {
-            #login-layer {
-                padding: 20px;
-                align-items: flex-start;
-                /* Geser ke atas di mobile */
+        /* Spinner Loading Login */
+        #loading-verify {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0 0 0;
+            color: var(--col-teal);
+            font-weight: 600;
+        }
+
+        .dot-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 20px;
+            margin-bottom: 15px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            margin: 0 5px;
+            background-color: var(--col-teal);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
             }
 
-            .login-container {
-                height: auto;
-                /* Tinggi disesuaikan konten */
-                flex-direction: column;
-                /* Ubah menjadi kolom vertikal */
-                max-width: 100%;
-            }
-
-            .welcome-box {
-                display: none;
-                /* Sembunyikan welcome box di mobile */
-            }
-
-            .login-box {
-                width: 100%;
-                padding: 35px 25px;
-                border-radius: 20px;
-                /* Pastikan radius tetap ada di mobile */
-                box-shadow: none;
+            40% {
+                transform: scale(1.0);
             }
         }
 
-        /* APP LAYOUT */
+        /* =========================================
+           5. HALAMAN UTAMA (UJIAN)
+           ========================================= */
         #app-layer {
             display: none;
             height: 100%;
@@ -305,13 +409,15 @@
             flex-direction: row;
         }
 
+        /* SIDEBAR */
         #sidebar {
             width: var(--sidebar-w);
-            background: white;
+            background: var(--bg-card);
             display: flex;
             flex-direction: column;
             z-index: 2;
             box-shadow: 5px 0 25px rgba(0, 0, 0, 0.05);
+            transition: background 0.3s;
         }
 
         .sidebar-header-teal {
@@ -322,6 +428,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: background 0.3s;
         }
 
         .custom-logo-header {
@@ -389,6 +496,7 @@
             box-shadow: 0 0 0 5px #B2EBF2;
         }
 
+        /* MAIN CONTENT */
         #main-area {
             flex: 1;
             position: relative;
@@ -397,43 +505,65 @@
             align-items: center;
             padding: 40px 100px;
             overflow-y: auto;
+            background: var(--bg-body);
         }
 
         .q-card {
-            background: white;
+            background: var(--bg-card);
             padding: 60px;
             border-radius: 20px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-card);
             width: 100%;
             max-width: 950px;
             margin: auto 0;
+            transition: background 0.3s;
         }
 
-        /* =========================================
-   PERBAIKAN: CSS LOADER GAMBAR
-   ========================================= */
+        /* GAMBAR SOAL & LOADER */
         #q-img-wrap {
             position: relative;
             min-height: 200px;
-            /* Tinggi minimum agar layout tidak lompat */
             display: none;
-            /* Default sembunyi */
             background: #f8f9fa;
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 30px;
             justify-content: center;
             align-items: center;
+            cursor: zoom-in;
+            /* Menandakan bisa di-klik */
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
         }
 
-        /* Spinner Loading */
+        #q-img-wrap:hover {
+            border-color: var(--col-teal-light);
+        }
+
+        /* Hint "Klik untuk Zoom" */
+        .img-overlay-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            backdrop-filter: blur(2px);
+        }
+
         .img-loader {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             display: none;
-            /* Default sembunyi, dikontrol JS */
             flex-direction: column;
             align-items: center;
             z-index: 10;
@@ -448,13 +578,6 @@
             animation: spin 1s linear infinite;
         }
 
-        .loading-text {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #666;
-            font-weight: 600;
-        }
-
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
@@ -465,60 +588,43 @@
             }
         }
 
-        /* Gambar Soal */
         #q-img-el {
             max-width: 100%;
             max-height: 450px;
             display: none;
-            /* Default sembunyi, hanya muncul jika selesai load */
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             z-index: 5;
         }
 
-        /* Pastikan gambar hidden saat loading */
-        .img-hidden {
-            display: none !important;
-        }
-
+        /* TEXT SOAL & OPSI */
         .q-text {
             font-size: 1.6rem;
             line-height: 1.5;
             margin-bottom: 40px;
-            color: #333;
+            color: var(--txt-main);
             font-weight: 500;
-        }
-
-        #q-img-wrap {
-            text-align: center;
-            margin-bottom: 40px;
-            display: none;
-        }
-
-        #q-img-wrap img {
-            max-width: 100%;
-            max-height: 450px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
         .opt-box {
             display: flex;
             align-items: center;
             padding: 20px 25px;
-            border: 2px solid #f0f4f8;
+            border: 2px solid var(--border-opt);
             border-radius: 12px;
             margin-bottom: 15px;
             cursor: pointer;
             transition: all 0.2s ease;
             font-size: 1.15rem;
-            background: #fff;
+            background: var(--bg-card);
+            color: var(--txt-main);
         }
 
         .opt-box:hover {
             background: var(--col-teal-faint);
             border-color: var(--col-teal-light);
             transform: translateX(5px);
+            color: #333;
         }
 
         .opt-box.selected {
@@ -527,16 +633,6 @@
             color: white;
             transform: translateX(10px);
             box-shadow: 0 5px 20px rgba(0, 135, 143, 0.25);
-        }
-
-        .cert-text-box {
-            background: white;
-            color: var(--col-teal-dark);
-            font-weight: 900;
-            font-size: 0.9rem;
-            letter-spacing: 1.5px;
-            padding: 6px 12px;
-            border-radius: 2px;
         }
 
         .opt-radio {
@@ -566,6 +662,9 @@
             border-radius: 50%;
         }
 
+        /* =========================================
+           6. TOMBOL NAVIGASI (DIPERBAIKI)
+           ========================================= */
         .nav-arrow {
             position: fixed;
             top: 50%;
@@ -575,27 +674,35 @@
             border-radius: 50%;
             border: none;
             background: white;
+            /* Background putih bersih */
             color: var(--col-teal);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            /* Ikon warna teal */
+            box-shadow: var(--shadow-nav);
+            /* Shadow lembut */
             cursor: pointer;
             z-index: 100;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* Efek bouncing */
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0;
         }
 
-        .nav-arrow svg {
-            width: 32px;
-            height: 32px;
-            fill: currentColor;
-        }
-
+        /* Hover Effect: Membesar dan berubah warna */
         .nav-arrow:hover:not(:disabled) {
             background: var(--col-teal);
             color: white;
             transform: translateY(-50%) scale(1.15);
+            box-shadow: 0 15px 35px rgba(0, 135, 143, 0.4);
+        }
+
+        /* Ukuran Icon SVG */
+        .nav-arrow svg {
+            width: 32px;
+            height: 32px;
+            fill: currentColor;
+            /* Mengikuti warna text */
         }
 
         .nav-arrow:disabled {
@@ -607,10 +714,12 @@
             left: 340px;
         }
 
+        /* Disesuaikan dengan lebar sidebar */
         #btn-next {
             right: 40px;
         }
 
+        /* Tombol Selesai */
         #btn-finish {
             position: fixed;
             bottom: 40px;
@@ -634,6 +743,83 @@
             transform: scale(1.05) translateY(-5px);
         }
 
+        /* =========================================
+           7. DARK MODE & RESPONSIVE
+           ========================================= */
+        body.dark-mode {
+            --bg-body: #121212;
+            --bg-card: #1e1e1e;
+            --txt-main: #e0e0e0;
+            --txt-sec: #b0b0b0;
+            --border-opt: #333333;
+            --shadow-card: 0 15px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        body.dark-mode #sidebar {
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark-mode .sidebar-header-teal {
+            background: #1e1e1e;
+        }
+
+        body.dark-mode .timer-val {
+            color: var(--txt-main);
+        }
+
+        body.dark-mode .nav-dot {
+            background: #333;
+            color: #888;
+        }
+
+        body.dark-mode .nav-dot.answered {
+            background: #1e1e1e;
+            color: var(--col-teal-light);
+            box-shadow: 0 0 0 5px #004d40;
+        }
+
+        body.dark-mode .nav-dot.active {
+            box-shadow: 0 0 0 5px #004d40;
+        }
+
+        body.dark-mode .opt-box:hover {
+            background: #333;
+            color: white;
+        }
+
+        body.dark-mode .inp-login {
+            background: #333;
+            border-color: #444;
+            color: white;
+        }
+
+        body.dark-mode .nav-arrow {
+            background: #333;
+            color: var(--col-teal-light);
+        }
+
+        body.dark-mode .nav-arrow:hover:not(:disabled) {
+            background: var(--col-teal);
+            color: white;
+        }
+
+        /* Font Size Classes */
+        .q-card.font-small .q-text,
+        .q-card.font-small .opt-box {
+            font-size: 1.0rem;
+        }
+
+        .q-card.font-medium .q-text,
+        .q-card.font-medium .opt-box {
+            font-size: 1.2rem;
+        }
+
+        .q-card.font-large .q-text,
+        .q-card.font-large .opt-box {
+            font-size: 1.4rem;
+        }
+
+        /* Media Queries */
         @media (max-width: 1024px) {
             #btn-prev {
                 left: 30px;
@@ -646,9 +832,35 @@
             #main-area {
                 padding: 40px 80px;
             }
+
+            .login-container {
+                max-width: 750px;
+                height: 550px;
+            }
         }
 
         @media (max-width: 768px) {
+            #login-layer {
+                padding: 20px;
+                align-items: flex-start;
+            }
+
+            .login-container {
+                height: auto;
+                flex-direction: column;
+                max-width: 100%;
+                box-shadow: none;
+            }
+
+            .welcome-box {
+                display: none;
+            }
+
+            .login-box {
+                width: 100%;
+                padding: 35px 25px;
+            }
+
             #app-layer {
                 flex-direction: column;
             }
@@ -660,7 +872,6 @@
                 align-items: center;
                 justify-content: space-between;
                 padding: 0;
-                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
             }
 
             .sidebar-header-teal {
@@ -668,29 +879,12 @@
                 width: 100%;
                 padding: 12px 20px;
                 justify-content: space-between;
-                background: white;
                 border-bottom: 2px solid var(--col-teal);
-            }
-
-            .header-logo-row {
-                margin: 0;
-                width: auto;
-            }
-
-            .custom-logo-header {
-                max-height: 40px;
-                filter: none;
             }
 
             .header-divider,
             .sidebar-nav-content {
                 display: none;
-            }
-
-            .timer-wrapper {
-                align-items: flex-end;
-                display: flex;
-                flex-direction: column;
             }
 
             .timer-val {
@@ -718,6 +912,7 @@
                 font-size: 1rem;
             }
 
+            /* Mobile Navigation: Pindah ke bawah */
             .nav-arrow {
                 position: fixed;
                 top: auto;
@@ -746,187 +941,54 @@
                 padding: 15px 35px;
                 font-size: 1rem;
             }
-        }
 
-        /* =========================================
-   LOADING SPINNER STYLE BARU
-   ========================================= */
-        #loading-verify {
-            display: none;
-            /* Awalnya disembunyikan */
-            flex-direction: column;
-            align-items: center;
-            padding: 10px 0 0 0;
-            color: var(--col-teal);
-            font-weight: 600;
-        }
-
-        .dot-spinner {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 20px;
-            margin-bottom: 15px;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            margin: 0 5px;
-            background-color: var(--col-teal);
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-
-        .dot:nth-child(1) {
-            animation-delay: -0.32s;
-        }
-
-        .dot:nth-child(2) {
-            animation-delay: -0.16s;
-        }
-
-        @keyframes bounce {
-
-            0%,
-            80%,
-            100% {
-                transform: scale(0);
+            /* Mobile Zoom Fix */
+            .zoom-controls {
+                padding: 8px 15px;
+                gap: 10px;
             }
 
-            40% {
-                transform: scale(1.0);
-            }
-        }
-
-        /* ... di dalam blok <style> ... */
-
-        /* Variabel Warna Dark Mode */
-        :root {
-            /* ... variabel yang sudah ada ... */
-            --col-bg-dark: #121212;
-            --col-card-dark: #1e1e1e;
-            --col-text-dark: #e0e0e0;
-            --col-text-secondary-dark: #b0b0b0;
-            --col-border-dark: #333333;
-        }
-
-        /* --------------------------------- */
-        /* DARK MODE STYLES */
-        /* --------------------------------- */
-        body.dark-mode {
-            background: var(--col-bg-dark);
-        }
-
-        body.dark-mode #sidebar {
-            background: var(--col-card-dark);
-            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.4);
-        }
-
-        body.dark-mode .sidebar-header-teal {
-            background: var(--col-card-dark);
-            /* Ubah agar tidak terlalu terang */
-        }
-
-        body.dark-mode .timer-val {
-            color: var(--col-text-dark);
-        }
-
-        body.dark-mode .q-card {
-            background: var(--col-card-dark);
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
-        }
-
-        body.dark-mode .q-text {
-            color: var(--col-text-dark);
-        }
-
-        body.dark-mode .opt-box {
-            background: var(--col-card-dark);
-            border: 2px solid var(--col-border-dark);
-            color: var(--col-text-secondary-dark);
-        }
-
-        body.dark-mode .opt-box:hover {
-            background: var(--col-border-dark);
-        }
-
-        /* Penyesuaian Nav Dot untuk Dark Mode */
-        body.dark-mode .nav-dot {
-            background: #333;
-            color: #888;
-        }
-
-        body.dark-mode .nav-dot.answered {
-            background: var(--col-card-dark);
-            color: var(--col-teal-light);
-            box-shadow: 0 0 0 5px #004d40;
-            /* Teal gelap */
-        }
-
-        body.dark-mode .nav-dot.active {
-            background: var(--col-teal) !important;
-            color: white !important;
-            box-shadow: 0 0 0 5px #004d40;
-        }
-
-        /* Penyesuaian Header Mobile pada Dark Mode */
-        @media (max-width: 768px) {
-            body.dark-mode .sidebar-header-teal {
-                background: var(--col-card-dark);
-                border-bottom: 2px solid var(--col-teal);
-                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            input[type=range] {
+                width: 100px;
             }
 
-            body.dark-mode .timer-val {
-                color: var(--col-teal);
-                /* Pertahankan warna teal di mobile */
+            .zoom-close-btn {
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 24px;
             }
-        }
-
-        /* --------------------------------- */
-        /* FONT SIZE STYLES */
-        /* --------------------------------- */
-        .q-card.font-small .q-text {
-            font-size: 1.0rem;
-            /* Contoh ukuran kecil */
-        }
-
-        .q-card.font-medium .q-text {
-            font-size: 1.2rem;
-            /* Ukuran default */
-        }
-
-        .q-card.font-large .q-text {
-            font-size: 1.4rem;
-            /* Contoh ukuran besar */
-        }
-
-        /* Penyesuaian ukuran teks opsi */
-        .q-card.font-small .opt-box {
-            font-size: 1.0rem;
-        }
-
-        .q-card.font-large .opt-box {
-            font-size: 1.2rem;
         }
     </style>
 </head>
 
 <body>
 
+    <div id="zoom-modal">
+        <div class="zoom-header">
+            <div class="zoom-controls">
+                <span class="zoom-label"><span style="font-size:1.2rem;">🔍</span> ZOOM</span>
+                <input type="range" id="zoom-slider" min="1" max="3" step="0.1" value="1"
+                    oninput="updateZoom(this.value)">
+            </div>
+            <button class="zoom-close-btn" onclick="closeZoom()">&times;</button>
+        </div>
+        <div class="zoom-container">
+            <img id="img-zoomed" src="" alt="Zoomed Image">
+        </div>
+    </div>
+
     <div id="modal-overlay">
         <div id="modal-box">
             <div id="modal-ico"></div>
-            <h3 id="modal-ti" style="margin-bottom:15px;color:#333;font-weight:800;"></h3>
-            <p id="modal-msg" style="font-size:1.1rem;color:#555;margin-bottom:30px;line-height:1.6;"></p>
+            <h3 id="modal-ti" style="margin-bottom:15px;font-weight:800;"></h3>
+            <p id="modal-msg" style="font-size:1.1rem;margin-bottom:30px;line-height:1.6;"></p>
             <div id="modal-btns" style="display:flex;justify-content:center;flex-wrap:wrap;"></div>
         </div>
     </div>
 
     <div id="login-layer">
         <div class="login-container">
-
             <div class="login-box">
                 <div class="header-logo-row">
                     <img src="https://github.com/jokosaptono17/PLANTASTO/blob/main/LOGO%20PPD%202021.png?raw=true"
@@ -938,10 +1000,8 @@
 
                 <input type="text" id="inp-name" class="inp-login" placeholder="Nama Lengkap" autocomplete="off"
                     oninput="this.value = this.value.toUpperCase()">
-
                 <input type="text" id="inp-nrp" class="inp-login" placeholder="NRP Karyawan" autocomplete="off"
                     oninput="this.value = this.value.toUpperCase()">
-
                 <input type="text" id="inp-code" class="inp-login" placeholder="Kode Ujian" autocomplete="off"
                     oninput="this.value = this.value.toUpperCase()">
 
@@ -964,17 +1024,13 @@
             <div class="welcome-box">
                 <h1>WELCOME</h1>
                 <p>Sistem Ujian Sertifikasi Plant Asto. Silakan persiapkan diri Anda dan pastikan jaringan internet
-                    stabil sebelum memulai ujian.</p>
-
+                    stabil.</p>
                 <img src="https://github.com/jokosaptono17/SHE_LandingPage/blob/main/ASTO.png?raw=true" alt="Plant Asto"
                     style="max-width: 250px;">
-
-                <div class="welcome-note">
-                    ©
+                <div class="welcome-note">©
                     <?= new Date().getFullYear() ?> Plant Asto Certification System
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -985,17 +1041,15 @@
                     <img src="https://github.com/jokosaptono17/SHE_LandingPage/blob/main/ASTO.png?raw=true" alt="Logo"
                         class="custom-logo-header" onerror="this.style.display='none'">
                 </div>
-                <div style="color: #00878F;" class="cert-text-box">CERTFICATION</div>
+                <div
+                    style="color: #00878F; margin-top:10px; background:white; padding:4px 10px; border-radius:4px; font-weight:900; letter-spacing:1px; font-size:0.8rem;">
+                    CERTIFICATION</div>
                 <div class="header-divider"></div>
                 <div class="timer-wrapper">
                     <span
-                        style="font-size:0.85rem; font-weight:600; letter-spacing:4px; opacity:0.9; margin-bottom:8px; color: #00878F;"
-                        class="cert-text-box">TIME
-                        LEFT
-                    </span>
-                    <div>=====================</div>
-                    <span id="timer" class="timer-val">00:00:00</span>
-
+                        style="font-size:0.85rem; font-weight:600; letter-spacing:4px; opacity:0.9; margin-bottom:8px; color:white;">TIME
+                        LEFT</span>
+                    <span id="timer" class="timer-val" style="color:white;">00:00:00</span>
                 </div>
             </div>
             <div class="sidebar-nav-content">
@@ -1009,29 +1063,39 @@
                     <span id="dark-mode-text">Aktifkan Mode Malam</span> 🌙
                 </button>
             </div>
+
             <div class="q-card">
-                <div style="color:#aaa; font-weight:700; letter-spacing:1.5px; margin-bottom:25px;">SOAL <span
-                        id="q-idx">1</span> DARI <span id="q-total">10</span></div>
-                <div>
-                    <span style="font-size:0.9rem; color:#777; margin-right:10px;">Ukuran Teks:</span>
-                    <button class="btn-modal btn-grey font-size-btn" data-size="small"
-                        style="padding: 5px 10px; font-size: 0.8rem;">A-</button>
-                    <button class="btn-modal btn-teal font-size-btn" data-size="medium"
-                        style="padding: 5px 10px; font-size: 0.9rem;">A</button>
-                    <button class="btn-modal btn-grey font-size-btn" data-size="large"
-                        style="padding: 5px 10px; font-size: 1rem;">A+</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                    <div style="color:var(--txt-sec); font-weight:700; letter-spacing:1.5px;">SOAL <span
+                            id="q-idx">1</span> / <span id="q-total">10</span></div>
+
+                    <div>
+                        <button class="btn-modal btn-grey font-size-btn" data-size="small"
+                            style="padding: 5px 10px; font-size: 0.8rem;">A-</button>
+                        <button class="btn-modal btn-teal font-size-btn" data-size="medium"
+                            style="padding: 5px 10px; font-size: 0.9rem;">A</button>
+                        <button class="btn-modal btn-grey font-size-btn" data-size="large"
+                            style="padding: 5px 10px; font-size: 1rem;">A+</button>
+                    </div>
                 </div>
+
                 <div id="q-img-wrap">
                     <div id="q-loader-el" class="img-loader">
                         <div class="spinner-circle"></div>
                         <div class="loading-text">Memuat Gambar...</div>
                     </div>
-
                     <img id="q-img-el" src="" alt="Soal Image">
+
+                    <div class="img-overlay-hint">
+                        <span>🔍 Klik gambar untuk Zoom</span>
+                    </div>
                 </div>
+
                 <div class="q-text" id="q-txt">Loading...</div>
+
                 <div id="opt-wrap"></div>
             </div>
+
             <button id="btn-prev" class="nav-arrow" onclick="move(-1)">
                 <svg viewBox="0 0 24 24">
                     <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
@@ -1048,94 +1112,40 @@
 
     <script>
         // =========================================
-        // WAJIB GANTI URL INI DENGAN DEPLOY TERBARU!
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzXPy8vWkEXDe9-lMjLyg_gJXxQJm-QrOquVu8V-UrcamPF_ZGrCzcVkXhoCe5B-Jit/exec';
+        // CONFIG & STATE
         // =========================================
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzXPy8vWkEXDe9-lMjLyg_gJXxQJm-QrOquVu8V-UrcamPF_ZGrCzcVkXhoCe5B-Jit/exec';
 
-        let st = { q: [], ans: [], i: 0, nm: '', nrp: '', cd: '', tm: null, v: 0 };
+        let st = { q: [], ans: [], i: 0, nm: '', nrp: '', cd: '', tm: null, v: 0, duration: 5400 };
 
-        // ... di dalam blok <script> ...
-
+        // =========================================
+        // SECURITY FUNCTIONS
+        // =========================================
         function disableKeys() {
             document.onkeydown = function (e) {
-                // Mencegah PrtSc (Print Screen)
-                if (e.key === 'PrintScreen' || e.key === 'p' && e.ctrlKey) {
-                    alert('Aksi screenshot tidak diizinkan selama ujian.');
-                    return false;
-                }
-
-                // Mencegah F12 (Developer Tools)
-                if (e.key === 'F12') {
-                    alert('Akses Developer Tools diblokir.');
-                    return false;
-                }
-
-                // Mencegah Ctrl+U (View Source)
-                if (e.ctrlKey && e.key === 'u') {
-                    alert('Melihat source code diblokir.');
-                    return false;
-                }
-
-                // Mencegah Ctrl+S (Save Page)
-                if (e.ctrlKey && e.key === 's') {
-                    alert('Menyimpan halaman diblokir.');
-                    return false;
-                }
+                if (e.key === 'PrintScreen' || (e.key === 'p' && e.ctrlKey)) { alert('Screenshot dilarang.'); return false; }
+                if (e.key === 'F12') { return false; }
+                if (e.ctrlKey && e.key === 'u') { return false; }
+                if (e.ctrlKey && e.key === 's') { return false; }
             };
         }
 
-        // Fungsi untuk menangani Dark Mode
-        // ... di dalam blok <script> ...
-
-
-        // Fungsi untuk menangani Dark Mode
+        // =========================================
+        // UI PREFERENCE (DARK MODE & FONT)
+        // =========================================
         function toggleDarkMode() {
             const body = document.body;
             body.classList.toggle('dark-mode');
             const isDarkMode = body.classList.contains('dark-mode');
-
-            // Simpan preferensi pengguna ke Local Storage
             localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-
-            // Update teks tombol
             document.getElementById('dark-mode-text').innerText = isDarkMode ? 'Nonaktifkan Mode Malam' : 'Aktifkan Mode Malam';
         }
 
-        // Terapkan preferensi mode malam saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', () => {
-            // ... (kode lain di sini)
-
-            // Inisialisasi Dark Mode
-            const savedMode = localStorage.getItem('darkMode');
-            const toggleBtn = document.getElementById('dark-mode-toggle');
-
-            if (savedMode === 'enabled') {
-                document.body.classList.add('dark-mode');
-                document.getElementById('dark-mode-text').innerText = 'Nonaktifkan Mode Malam';
-            }
-
-            // Tambahkan event listener ke tombol toggle
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', toggleDarkMode);
-            }
-        });
-
-        // ... fungsi doLogin(), init(), load(), dll.
-
-        // 
-        // ... di dalam blok <script> ...
-
         function setFontSize(size) {
             const qCard = document.querySelector('.q-card');
-            // Hapus semua kelas ukuran font yang mungkin ada
             qCard.classList.remove('font-small', 'font-medium', 'font-large');
+            if (size !== 'medium') qCard.classList.add(`font-${size}`);
 
-            // Tambahkan kelas baru
-            if (size !== 'medium') { // Jika bukan medium (default)
-                qCard.classList.add(`font-${size}`);
-            }
-
-            // Perbarui status tombol aktif
             document.querySelectorAll('.font-size-btn').forEach(btn => {
                 btn.classList.remove('btn-teal');
                 btn.classList.add('btn-grey');
@@ -1144,26 +1154,55 @@
                     btn.classList.add('btn-teal');
                 }
             });
-
-            // Simpan preferensi
             localStorage.setItem('fontSize', size);
         }
 
-        // ... di dalam document.addEventListener('DOMContentLoaded', () => { ... })
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedMode = localStorage.getItem('darkMode');
+            if (savedMode === 'enabled') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('dark-mode-text').innerText = 'Nonaktifkan Mode Malam';
+            }
+            document.getElementById('dark-mode-toggle').addEventListener('click', toggleDarkMode);
 
-        // Inisialisasi Font Size
-        const savedFontSize = localStorage.getItem('fontSize') || 'medium';
-        setFontSize(savedFontSize); // Panggil fungsi inisialisasi
-
-        // Tambahkan event listener untuk tombol font
-        document.querySelectorAll('.font-size-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                setFontSize(this.getAttribute('data-size'));
+            const savedFontSize = localStorage.getItem('fontSize') || 'medium';
+            setFontSize(savedFontSize);
+            document.querySelectorAll('.font-size-btn').forEach(btn => {
+                btn.addEventListener('click', function () { setFontSize(this.getAttribute('data-size')); });
             });
         });
 
-        // ...
+        // =========================================
+        // ZOOM LOGIC (LIGHTBOX)
+        // =========================================
+        function openZoom(src) {
+            if (!src) return;
+            const modal = document.getElementById('zoom-modal');
+            const img = document.getElementById('img-zoomed');
+            const slider = document.getElementById('zoom-slider');
 
+            img.src = src;
+            img.style.transform = 'scale(1)';
+            slider.value = 1; // Reset slider
+
+            modal.classList.add('show');
+        }
+
+        function closeZoom() {
+            document.getElementById('zoom-modal').classList.remove('show');
+            // Reset src setelah animasi selesai agar bersih
+            setTimeout(() => { document.getElementById('img-zoomed').src = ''; }, 300);
+        }
+
+        function updateZoom(val) {
+            const img = document.getElementById('img-zoomed');
+            img.style.transform = `scale(${val})`;
+            img.style.cursor = val > 1 ? 'grab' : 'default';
+        }
+
+        // =========================================
+        // CORE FUNCTIONS (MODAL, LOGIN, NAV)
+        // =========================================
         function modal(ti, msg, type, btns) {
             const ico = { ok: '<span style="color:var(--col-success)">&#10004;</span>', err: '<span style="color:var(--col-danger)">&#10006;</span>', warn: '<span style="color:#F39C12">&#9888;</span>' };
             document.getElementById('modal-ico').innerHTML = `<span class="modal-icon">${ico[type] || ''}</span>`;
@@ -1178,58 +1217,42 @@
             document.getElementById('mok').onclick = () => { closeM(); if (cb) cb(); };
         }
 
-        // ... (Baris 380 - 418 di <script>)
-
         function doLogin() {
-            // AMBIL VALUE NAMA, NRP, DAN KODE
             const n = document.getElementById('inp-name').value.trim();
             const nr = document.getElementById('inp-nrp').value.trim();
             const c = document.getElementById('inp-code').value.trim();
 
             if (!n || !nr || !c) return alertM("Gagal", "Nama, NRP, dan Kode wajib diisi!", 'err');
 
-            // START: KODE BARU UNTUK SPINNER
             document.getElementById('btn-login').style.display = 'none';
             document.getElementById('loading-verify').style.display = 'flex';
-            // END: KODE BARU UNTUK SPINNER
-
-            // PERBAIKAN KRUSIAL V7.1: Kirim Nama dan NRP ke handleLogin()
-            const dataToSend = {
-                action: 'login',
-                nama: n,    // <--- KIRIM NAMA
-                nrp: nr,    // <--- KIRIM NRP
-                kode: c     // <--- KIRIM KODE
-            };
 
             fetch(API_URL, {
                 method: 'POST',
-                body: JSON.stringify(dataToSend)
+                body: JSON.stringify({ action: 'login', nama: n, nrp: nr, kode: c })
             })
                 .then(r => r.json()).then(d => {
                     if (d.status === 'success') {
-                        st.nm = n; st.nrp = nr; st.cd = c; // SIMPAN NRP KE STATE
+                        st.nm = n; st.nrp = nr; st.cd = c;
                         st.q = d.questions;
                         st.ans = new Array(d.questions.length).fill(null);
-
-                        // --- START PERUBAHAN V7.5 ---
-                        // TANGKAP DURASI DARI SERVER (handleLogin)
-                        st.duration = d.duration; // <--- BARIS PENTING: Durasi disimpan ke st.duration
-                        // --- END PERUBAHAN V7.5 ---
+                        // Fallback duration jika server gagal kirim
+                        st.duration = d.duration ? parseInt(d.duration) : 5400;
 
                         document.getElementById('login-layer').style.display = 'none';
                         document.getElementById('app-layer').style.display = 'flex';
                         document.getElementById('q-total').innerText = st.q.length;
+
                         init();
                     } else { alertM("Login Gagal", d.message, 'err'); resetL(); }
                 }).catch(() => { alertM("Error", "Gagal koneksi server.", 'err'); resetL(); });
         }
-        // ... (Lanjutkan dengan fungsi resetL() dan seterusnya)
+
         function resetL() {
-            // START: KODE BARU UNTUK SPINNER
             document.getElementById('btn-login').style.display = 'block';
             document.getElementById('loading-verify').style.display = 'none';
-            // END: KODE BARU UNTUK SPINNER
         }
+
         function init() {
             const g = document.getElementById('nav-grid');
             st.q.forEach((_, i) => {
@@ -1238,83 +1261,62 @@
             });
 
             load(0);
-
-            // --- START PERUBAHAN V7.5 ---
-            // Mengganti nilai hardcode 5400 dengan durasi dinamis dari server
             timer(st.duration);
-            // --- END PERUBAHAN V7.5 ---
-
-            // index.html, di bagian atas blok <script>
-            // ...
-
-            disableKeys(); // <--- Panggil di sini agar aktif sejak awal
-            // ...
-
+            disableKeys();
             secure();
             window.onbeforeunload = () => "Ujian sedang berlangsung!";
         }
+
         function load(i) {
             st.i = i;
-
-            // 1. Update UI Teks Soal & Nomor
             document.getElementById('q-idx').innerText = i + 1;
             document.getElementById('q-txt').innerText = st.q[i].text;
 
-            // ============================================================
-            // 2. LOGIKA GAMBAR ANTI-GHOSTING (REVISI TOTAL)
-            // ============================================================
+            // --- LOGIKA GAMBAR DENGAN ZOOM ---
             const wrap = document.getElementById('q-img-wrap');
             const imgEl = document.getElementById('q-img-el');
             const loader = document.getElementById('q-loader-el');
+            const url = st.q[i].image;
 
-            const currentImgUrl = st.q[i].image;
-
-            // LANGKAH A: RESET STATE (Wajib dilakukan pertama kali)
-            // Sembunyikan gambar SEGERA agar gambar lama tidak terlihat (Ghosting hilang)
+            // Reset State Gambar
             imgEl.style.display = 'none';
-            imgEl.src = ''; // Kosongkan src sementara agar browser memutus render lama
-            loader.style.display = 'none'; // Reset loader
-            wrap.style.display = 'none';   // Reset wrapper
+            imgEl.src = '';
+            loader.style.display = 'none';
+            wrap.style.display = 'none';
 
-            // LANGKAH B: CEK APAKAH ADA GAMBAR
-            if (currentImgUrl && currentImgUrl.length > 5) {
-                // B1. Tampilkan Wrapper & Loader
-                wrap.style.display = 'flex';
-                loader.style.display = 'flex';
+            if (url && url.length > 5) {
+                wrap.style.display = 'flex'; // Munculkan wrapper
+                loader.style.display = 'flex'; // Munculkan loader
 
-                // B2. Buat objek Image baru di memori untuk pre-loading (Opsional tapi lebih stabil)
-                // Atau langsung tembak ke elemen DOM
-                imgEl.src = currentImgUrl;
+                imgEl.src = url;
 
-                // B3. Event Listener: Hanya tampilkan gambar jika SUDAH SELESAI download
                 imgEl.onload = function () {
-                    loader.style.display = 'none'; // Sembunyikan loader
-                    imgEl.style.display = 'block'; // Munculkan gambar baru
+                    loader.style.display = 'none';
+                    imgEl.style.display = 'block';
+                    // Tambahkan event click untuk ZOOM
+                    imgEl.onclick = function () { openZoom(url); };
                 };
 
-                // B4. Handle Error (Jika gambar rusak/link mati)
                 imgEl.onerror = function () {
                     loader.style.display = 'none';
-                    // Tampilkan pesan error text di wrapper jika mau, atau biarkan kosong
+                    imgEl.style.display = 'none';
+                    // Bisa tambah placeholder di sini jika mau
                 };
             }
-            // Jika tidak ada gambar, wrapper tetap display: none (dari Langkah A)
+            // ---------------------------------
 
-            // ============================================================
-
-            // 3. Render Opsi Jawaban (Sama seperti sebelumnya)
             const opt = document.getElementById('opt-wrap');
             opt.innerHTML = '';
             ['A', 'B', 'C', 'D'].forEach((L, idx) => {
-                // Mencegah error jika opsi kosong di database
                 const val = st.q[i].options[idx] || '';
                 opt.innerHTML += `<div class="opt-box ${st.ans[i] === L ? 'selected' : ''}" onclick="answ(${i},'${L}')"><div class="opt-radio"></div><span>${val}</span></div>`;
             });
-
-            upd(); // Update tombol navigasi
+            upd();
         }
+
         function answ(i, v) { st.ans[i] = v; load(i); }
         function move(d) { load(st.i + d); }
+
         function upd() {
             st.q.forEach((_, i) => {
                 const el = document.getElementById('dot-' + i);
@@ -1325,6 +1327,7 @@
             document.getElementById('btn-next').style.display = last ? 'none' : 'flex';
             document.getElementById('btn-finish').style.display = last ? 'block' : 'none';
         }
+
         function timer(s) {
             st.tm = setInterval(() => {
                 s--; const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
@@ -1332,89 +1335,66 @@
                 if (s <= 0) { clearInterval(st.tm); alertM("WAKTU HABIS", "Otomatis dikumpulkan.", 'warn', () => sub(true)); }
             }, 1000);
         }
+
         function secure() {
+            // Fullscreen attempt (opsional)
             document.documentElement.requestFullscreen().catch(() => { });
+
             document.addEventListener("visibilitychange", () => { if (document.hidden) warn("Keluar dari aplikasi."); });
             window.onblur = () => { setTimeout(() => { if (!document.hasFocus()) warn("Kehilangan fokus."); }, 1000); };
             document.oncontextmenu = e => e.preventDefault();
-            document.onkeydown = e => { if (["F12", "F5", "PrintScreen"].includes(e.key) || (e.ctrlKey && ["r", "c", "v", "x"].includes(e.key))) e.preventDefault(); };
         }
-       // Logika Baru: Peringatan bertingkat tanpa Diskualifikasi
-function warn(m) {
-    st.v++; // Tambah counter pelanggaran
-    
-    // Peringatan tahap awal (1 sampai 9 kali)
-    if (st.v < 10) {
-        alertM(
-            "PERINGATAN FOKUS", 
-            `${m}<br>Terdeteksi perpindahan tab/layar.<br>Pelanggaran ke: <b>${st.v}</b>`, 
-            'warn'
-        );
-    } 
-    // Peringatan ke-10 (Peringatan Terakhir yang muncul popup)
-    else if (st.v === 10) {
-        alertM(
-            "PERINGATAN TERAKHIR", 
-            `Anda telah melakukan <b>10 kali</b> pelanggaran fokus.<br>Sistem terus mencatat perilaku ini dan akan dilaporkan di hasil akhir.<br>Harap kerjakan dengan jujur!`, 
-            'err' // Tipe error agar warna merah
-        );
-    }
-    // Jika lebih dari 10, sistem diam saja (silent count) atau bisa alert kecil, 
-    // tapi sesuai request "system tetap berjalan" tanpa gangguan berlebih.
-    // Data st.v tetap bertambah di background untuk dikirim nanti.
-}
+
+        function warn(m) {
+            st.v++;
+            if (st.v < 10) {
+                alertM("PERINGATAN FOKUS", `${m}<br>Terdeteksi perpindahan tab/layar.<br>Pelanggaran ke: <b>${st.v}</b>`, 'warn');
+            } else if (st.v === 10) {
+                alertM("PERINGATAN TERAKHIR", `Anda telah melakukan <b>10 kali</b> pelanggaran fokus.<br>Sistem terus mencatat perilaku ini dan akan dilaporkan di hasil akhir.<br>Harap kerjakan dengan jujur!`, 'err');
+            }
+        }
+
         function askFinish() {
             const n = st.ans.filter(a => a === null).length;
             modal("Konfirmasi Selesai", n > 0 ? `Masih ada <b>${n}</b> soal kosong. Yakin kumpulkan?` : "Yakin ingin mengakhiri ujian?", 'warn',
                 `<button class="btn-modal btn-grey" onclick="closeM()">BATAL</button><button class="btn-modal btn-red" onclick="sub(false)">YA, SELESAI</button>`);
         }
-    function sub(auto) {
-    closeM(); 
-    clearInterval(st.tm); 
-    window.onblur = null; 
-    document.onvisibilitychange = null; // Matikan deteksi pelanggaran saat submit
-    
-    document.getElementById('app-layer').style.opacity = '0.5'; 
-    document.getElementById('app-layer').style.pointerEvents = 'none';
-    
-    let sc = 0; 
-    st.q.forEach((q, i) => { if (st.ans[i] === q.correctKey) sc++; });
 
-    // PERBAIKAN DI SINI: Menambahkan 'peringatan: st.v'
-    const dataKirim = {
-        action: 'submit',
-        nama: st.nm,
-        nrp: st.nrp,
-        kode: st.cd,
-        benar: sc,
-        total: st.q.length,
-        peringatan: st.v // <--- KIRIM JUMLAH PELANGGARAN
-    };
+        function sub(auto) {
+            closeM();
+            clearInterval(st.tm);
+            window.onblur = null;
+            document.onvisibilitychange = null;
 
-    fetch(API_URL, { 
-        method: 'POST', 
-        body: JSON.stringify(dataKirim) 
-    })
-    .then(r => r.json())
-    .then(d => alertM("UJIAN SELESAI", `Nilai Anda: YA RAHASIA,TERIMAKASIH`, 'ok', () => location.reload()))
-    .catch(() => { 
-        alertM("Gagal Kirim", "Coba tekan SELESAI lagi.", 'err'); 
-        document.getElementById('app-layer').style.opacity = '1'; 
-        document.getElementById('app-layer').style.pointerEvents = 'all'; 
-    });
-}
+            document.getElementById('app-layer').style.opacity = '0.5';
+            document.getElementById('app-layer').style.pointerEvents = 'none';
+
+            let sc = 0;
+            st.q.forEach((q, i) => { if (st.ans[i] === q.correctKey) sc++; });
+
+            const dataKirim = {
+                action: 'submit',
+                nama: st.nm,
+                nrp: st.nrp,
+                kode: st.cd,
+                benar: sc,
+                total: st.q.length,
+                peringatan: st.v
+            };
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(dataKirim)
+            })
+                .then(r => r.json())
+                .then(d => alertM("UJIAN SELESAI", `Terima kasih. Jawaban telah tersimpan.`, 'ok', () => location.reload()))
+                .catch(() => {
+                    alertM("Gagal Kirim", "Coba tekan SELESAI lagi.", 'err');
+                    document.getElementById('app-layer').style.opacity = '1';
+                    document.getElementById('app-layer').style.pointerEvents = 'all';
+                });
+        }
     </script>
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
